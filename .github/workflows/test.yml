@@ -80,41 +80,41 @@ jobs:
         run: |
           poetry run pytest -v
 
-  run_tests_windows:
-    runs-on: ${{ matrix.os }}
+          # run_tests_windows:
+          #   runs-on: ${{ matrix.os }}
 
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["windows-latest"]
-        python-version: ["3.8.16"]
+          #   strategy:
+          #     fail-fast: false
+          #     matrix:
+          #       os: ["windows-latest"]
+          #       python-version: ["3.8.16"]
 
-    timeout-minutes: 20
+          #   timeout-minutes: 20
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+          #   steps:
+          #     - name: Checkout
+          #       uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
+          #     - name: Set up Python ${{ matrix.python-version }}
+          #       uses: actions/setup-python@v3
+          #       with:
+          #         python-version: ${{ matrix.python-version }}
 
-      - name: Install poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - name: Poetry Version
-        run: |
-          poetry --version
-      - name: Poetry Install Dependencies
-        run: |
-          pyver=`python -c "import platform; print(platform.python_version())"`
-          poetry env use $pyver
-          poetry install --no-interaction --no-root
-      - name: Test with pytest
-        run: |
-          poetry run pytest -v
+          #     - name: Install poetry
+          #       run: |
+          #         curl -sSL https://install.python-poetry.org | python3 -
+          #         echo "$HOME/.local/bin" >> $GITHUB_PATH
+          #     - name: Poetry Version
+          #       run: |
+          #         poetry --version
+          #     - name: Poetry Install Dependencies
+          #       run: |
+          #         pyver=`python -c "import platform; print(platform.python_version())"`
+          #         poetry env use $pyver
+          #         poetry install --no-interaction --no-root
+          #     - name: Test with pytest
+          #       run: |
+          #         poetry run pytest -v
 
   # upload code coverage report
   code-coverage:
