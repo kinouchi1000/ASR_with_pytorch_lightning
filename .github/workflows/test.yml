@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, "release/*", "dev"]
+    branches: [main, "feat/*" , "release/*", "dev"]
 
 jobs:
   run_tests_ubuntu:
@@ -27,21 +27,21 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
-          pip install sh
+    - name: Install poetry
+      run: |
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+        echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+    - name: Poetry Version
+      run: |
+        poetry --version
+    - name: Poetry Install Dependencies
+      run: |
+        poetry install --no-interaction
 
-      - name: List dependencies
-        run: |
-          python -m pip list
-
-      - name: Run pytest
-        run: |
-          pytest -v
-
+    - name: Test with pytest
+      run: |
+        poetry run pytest -v
+  
   run_tests_macos:
     runs-on: ${{ matrix.os }}
 
@@ -62,20 +62,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: Install poetry
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
-          pip install sh
-
-      - name: List dependencies
+          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+      - name: Poetry Version
         run: |
-          python -m pip list
-
-      - name: Run pytest
+          poetry --version
+      - name: Poetry Install Dependencies
         run: |
-          pytest -v
+          poetry install --no-interaction
+      - name: Test with pytest
+        run: |
+          poetry run pytest -v
 
   run_tests_windows:
     runs-on: ${{ matrix.os }}
@@ -97,19 +96,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: Install poetry
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
-
-      - name: List dependencies
+          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+      - name: Poetry Version
         run: |
-          python -m pip list
-
-      - name: Run pytest
+          poetry --version
+      - name: Poetry Install Dependencies
         run: |
-          pytest -v
+          poetry install --no-interaction
+      - name: Test with pytest
+        run: |
+          poetry run pytest -v
 
   # upload code coverage report
   code-coverage:
@@ -124,16 +123,19 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install dependencies
+      - name: Install poetry
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
-          pip install pytest-cov[toml]
-          pip install sh
+          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+      - name: Poetry Version
+        run: |
+          poetry --version
+      - name: Poetry Install Dependencies
+        run: |
+          poetry install --no-interaction
 
       - name: Run tests and collect coverage
-        run: pytest --cov src # NEEDS TO BE UPDATED WHEN CHANGING THE NAME OF "src" FOLDER
+        run: poetry run pytest --cov src # NEEDS TO BE UPDATED WHEN CHANGING THE NAME OF "src" FOLDER
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
