@@ -1359,7 +1359,7 @@ files = [
 [[package]]
 name = "loggers"
 version = "0.1.4"
-description = "Usefull wrapper methods for logging native package"
+description = "Useful wrapper methods for logging native package"
 category = "main"
 optional = false
 python-versions = "*"
