@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, "feat/*" , "release/*", "dev"]
+    branches: [main, "feat/*", "release/*", "dev"]
 
 jobs:
   run_tests_ubuntu:
@@ -38,12 +38,12 @@ jobs:
         run: |
           pyver=`python -c "import platform; print(platform.python_version())"`
           poetry env use $pyver
-          poetry install --no-interaction
+          poetry install --no-interaction --no-root
 
       - name: Test with pytest
         run: |
           poetry run pytest -v
-  
+
   run_tests_macos:
     runs-on: ${{ matrix.os }}
 
@@ -75,7 +75,7 @@ jobs:
         run: |
           pyver=`python -c "import platform; print(platform.python_version())"`
           poetry env use $pyver
-          poetry install --no-interaction
+          poetry install --no-interaction --no-root
       - name: Test with pytest
         run: |
           poetry run pytest -v
@@ -111,7 +111,7 @@ jobs:
         run: |
           pyver=`python -c "import platform; print(platform.python_version())"`
           poetry env use $pyver
-          poetry install --no-interaction
+          poetry install --no-interaction --no-root
       - name: Test with pytest
         run: |
           poetry run pytest -v
@@ -138,7 +138,7 @@ jobs:
           poetry --version
       - name: Poetry Install Dependencies
         run: |
-          poetry install --no-interaction
+          poetry install --no-interaction --no-root
 
       - name: Run tests and collect coverage
         run: poetry run pytest --cov src # NEEDS TO BE UPDATED WHEN CHANGING THE NAME OF "src" FOLDER
