@@ -48,7 +48,7 @@ loggers = "^0.1.4"
 wandb = "^0.14.2"
 pyrootutils = "^1.0.4"
 pre-commit = "^3.2.2"
-rich = "^13.3.4"
+rich = "^13.3.5"
 pytest = "^7.3.1"
 pytest-cov = "^4.0.0"
 
