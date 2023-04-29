@@ -25,11 +25,8 @@ preview = true
 # Build system information and other project-specific configuration below.
 # NOTE: You don't need this in your own Black configuration.
 
-
-[tool.flake8]
-max-line-length = 119
-extend-ignore = "E203,E501,"
-max-complexity = 10
+[tool.isort]
+profile = "black"
 
 [tool.poetry]
 name = "asr-with-pytorch-lightning"
@@ -57,6 +54,7 @@ pytest = "^7.3.1"
 pytest-cov = "^4.0.0"
 wget = "^3.2"
 loguru = "^0.7.0"
+torchaudio = "^2.0.1"
 
 
 [tool.poetry.group.dev.dependencies]

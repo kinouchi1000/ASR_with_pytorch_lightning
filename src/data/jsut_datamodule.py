@@ -1,17 +1,18 @@
+import random
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Optional, Tuple
 
-import torch
 from lightning import LightningDataModule
-from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
-from torchvision.datasets import MNIST
-from torchvision.transforms import transforms
+from torch.utils.data import DataLoader, Dataset
+
+from .components.audio_text_datasets import AudioTextDataset
+from .formatter.jsut import JSUTFormatter
 
 
 @dataclass
 class JSUTDataModule(LightningDataModule):
-    """Example of LightningDataModule for JSUT courpus
-
+    """
+    Example of LightningDataModule for JSUT courpus
     日本語女性音声のコーパスのJSUTのDatamodule
     reference : https://sites.google.com/site/shinnosuketakamichi/publication/jsut?pli=1
 
@@ -25,7 +26,6 @@ class JSUTDataModule(LightningDataModule):
 
     def __post_init__(self):
         super().__init__()
-
         self.save_hyperparameters(logger=False)
 
         self.data_train: Optional[Dataset] = None
@@ -33,26 +33,29 @@ class JSUTDataModule(LightningDataModule):
         self.data_test: Optional[Dataset] = None
 
     def prepare_data(self):
-        """Download JSUT"""
-        MNIST(self.hparams.data_dir, train=True, download=True)
-        MNIST(self.hparams.data_dir, train=False, download=True)
+        """
+        Download JSUT
+        """
+        JSUTFormatter(self.data_dir)
 
     def setup(self, stage: Optional[str] = None):
-        """Load data. Set variables: `self.data_train`, `self.data_val`, `self.data_test`.
-
-        This method is called by lightning with both `trainer.fit()` and `trainer.test()`, so be
-        careful not to execute things like random split twice!
+        """
+        Load data. Set variables: `self.data_train`, `self.data_val`, `self.data_test`.
         """
         # load and split datasets only if not loaded already
         if not self.data_train and not self.data_val and not self.data_test:
-            trainset = MNIST(self.hparams.data_dir, train=True, transform=self.transforms)
-            testset = MNIST(self.hparams.data_dir, train=False, transform=self.transforms)
-            dataset = ConcatDataset(datasets=[trainset, testset])
-            self.data_train, self.data_val, self.data_test = random_split(
-                dataset=dataset,
-                lengths=self.hparams.train_val_test_split,
-                generator=torch.Generator().manual_seed(42),
-            )
+            jsut = JSUTFormatter(self.data_dir)
+            all_manifest = jsut.get_manifest()
+            random.shuffle(all_manifest)
+            train_idx = int(len(all_manifest) * self.train_val_test_split_per[0])
+            valid_idx = int(len(all_manifest) * self.train_val_test_split_per[1])
+            train = all_manifest[:train_idx]
+            val = all_manifest[train_idx : train_idx + valid_idx]
+            test = all_manifest[train_idx + valid_idx :]
+
+            self.data_train = AudioTextDataset(train)
+            self.data_val = AudioTextDataset(val)
+            self.data_test = AudioTextDataset(test)
 
     def train_dataloader(self):
         return DataLoader(
@@ -80,19 +83,3 @@ class JSUTDataModule(LightningDataModule):
             pin_memory=self.hparams.pin_memory,
             shuffle=False,
         )
-
-    def teardown(self, stage: Optional[str] = None):
-        """Clean up after fit or test."""
-        pass
-
-    def state_dict(self):
-        """Extra things to save to checkpoint."""
-        return {}
-
-    def load_state_dict(self, state_dict: Dict[str, Any]):
-        """Things to do when loading checkpoint."""
-        pass
-
-
-if __name__ == "__main__":
-    _ = MNISTDataModule()
